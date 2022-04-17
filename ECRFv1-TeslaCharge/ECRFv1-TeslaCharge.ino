@@ -1,4 +1,4 @@
-// ECRF v2 Tesla Charge Door Opener
+// ECRF v1 Tesla Charge Door Opener
 // Based on: https://github.com/fredilarsen/TeslaChargeDoorOpener
 
 /*
@@ -28,6 +28,7 @@
 //Pushbutton Pins
 int push1 = 34;
 int push2 = 35;
+int push3 = 32;
 
 //CC1101 Pins
 int RXPin = 26;
@@ -60,6 +61,7 @@ String bindataprotocol;
 String bindata_protocol;
 int pushbutton1 = 0;
 int pushbutton2 = 0;
+int pushbutton3 = 0;
 
 // The signal to send
 const uint16_t pulseWidth = 400;                // Microseconds
@@ -100,20 +102,22 @@ void sendByte(uint8_t dataByte) {
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(38400);
-  ELECHOUSE_cc1101.addSpiPin(14, 12, 13, 5, 0);
-  ELECHOUSE_cc1101.addSpiPin(14, 12, 13, 27, 1);
+  ELECHOUSE_cc1101.addSpiPin(18, 19, 23, 5, 0);
+  ELECHOUSE_cc1101.addSpiPin(18, 19, 23, 27, 1);
   pinMode(TXPin0, OUTPUT);
   digitalWrite(TXPin0, LOW);
   EEPROM.begin(4096);
   delay(2000);
   pinMode(push1, INPUT);
   pinMode(push2, INPUT);
+  pinMode(push3, INPUT);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   pushbutton1 = digitalRead(push1);
   pushbutton2 = digitalRead(push2);
+  pushbutton3 = digitalRead(push3);
 
   if (pushbutton1 == LOW) {
     Serial.println("Start");
@@ -121,6 +125,11 @@ void loop() {
   }
 
   else if (pushbutton2 == LOW) {
+    Serial.println("Start");
+    sendSignals();
+  }
+
+  else if (pushbutton3 == LOW) {
     Serial.println("Start");
     sendSignals();
   }
