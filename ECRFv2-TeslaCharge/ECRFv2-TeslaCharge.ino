@@ -35,6 +35,10 @@ int RXPin0 = 4;
 int TXPin0 = 2;
 int Gdo0 = 25;
 
+
+//LED
+int led = 32;
+
 //BTN Sending Config
 int btn_set_int;
 String btn_set;
@@ -74,12 +78,13 @@ const uint8_t sequence[messageLength] = {
   0x66,0x5A,0x69,0x6A,0x56,0x9A,0x65,0x5A,0x58,0xAC,0xB3,0x2C,0xCC,0xCC,0xB4,0xD2,
   0xD4,0xAD,0x34,0xCA,0xB4,0xA0};
 
-void sendSignals() {
+void sendSignals(float frequency) {
+  
   pinMode(TXPin0,OUTPUT);
   ELECHOUSE_cc1101.setModul(0);
   ELECHOUSE_cc1101.Init();
   ELECHOUSE_cc1101.setModulation(2);
-  ELECHOUSE_cc1101.setMHZ(433.92);
+  ELECHOUSE_cc1101.setMHZ(frequency);  
   ELECHOUSE_cc1101.setDeviation(0);
   ELECHOUSE_cc1101.SetTx();
   
@@ -88,6 +93,18 @@ void sendSignals() {
       digitalWrite(TXPin0, LOW);
       delay(messageDistance);
     }
+}
+
+//Blink the onboard LED
+void blinkLED(int repeat) {
+
+  for (int i = 0; i < repeat; i++) {
+    digitalWrite(led, LOW); // Turn the LED on
+    delay(1000);
+    digitalWrite(led, HIGH); // Turn the LED of
+    delay(1000);
+  }
+  
 }
 
 void sendByte(uint8_t dataByte) {
@@ -108,6 +125,8 @@ void setup() {
   delay(2000);
   pinMode(push1, INPUT);
   pinMode(push2, INPUT);
+  pinMode(led, OUTPUT); // Declare the LED as an output
+  digitalWrite(led, HIGH); // Turn the LED off
 }
 
 void loop() {
@@ -116,12 +135,16 @@ void loop() {
   pushbutton2 = digitalRead(push2);
 
   if (pushbutton1 == LOW) {
-    Serial.println("Start");
-    sendSignals();
+    Serial.println("TX 433.92");
+    sendSignals(433.92);
+    //Blink 4 times for 433Mhz
+    blinkLED(4);
   }
 
   else if (pushbutton2 == LOW) {
-    Serial.println("Start");
-    sendSignals();
+    Serial.println("TX 315.00");
+    sendSignals(315.00);
+    //Blink 3 times for 315Mhz
+    blinkLED(3);
   }
 }
